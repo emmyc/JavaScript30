@@ -26,7 +26,8 @@
       // and then we need to spread into a function (ES6) (...)
       fetch(endpoint)
         .then(blob => blob.json())
-        .then(data => cities.push(...data));
+        .then(data => cities.push(...data)); //stores spread of data into cities array
+
       function findMatches(wordToMatch, cities) {
         return cities.filter(place => {
           //need to figure out if city or state matches search word

@@ -1,19 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>HTML5 Canvas</title>
-</head>
-<body>
-<canvas id="draw" width="800" height="800"></canvas>
-<script>
-</script>
+  <head>
+    <meta charset="UTF-8" />
+    <title>HTML5 Canvas</title>
+  </head>
+  <body>
+    <canvas id="draw" width="800" height="800"></canvas>
+    <script>
+      // canvas is a CONTEXT
+      const canvas = document.querySelector("#draw");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-<style>
-  html, body {
-    margin: 0;
-  }
-</style>
+      ctx.strokeStyle = "#BADA55";
+      ctx.lineJoin = "round"; //smooths and rounds lines
+      ctx.lineCap = "round";
+      ctx.lineWidth = 100;
 
-</body>
+      // ctx.globalCompositeOperation = "multiply"; //multiply blending like in photoshop!!
+
+      // dummy variables
+      let isDrawing = false; //you can only draw when your cursor is down (holding m1)
+      let lastX = 0;
+      let lastY = 0; //start and stop for line, start point
+      let hue = 0;
+      let direction = true; //brush size builds up
+
+      function draw(e) {
+        if (!isDrawing) return; //stops function if not holding m1
+        ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`; //100% saturation, 50% lightness, hue starts at 0 = red
+        ctx.beginPath();
+        //start from...
+        ctx.moveTo(lastX, lastY);
+        //go to...
+        ctx.lineTo(e.offsetX, e.offsetY); //offset variables come from event in console
+        ctx.stroke(); //we don't see anything on page until we call stroke
+        //update lastX and lastY
+        [lastX, lastY] = [e.offsetX, e.offsetY]; //destructure array in ES6
+        hue++;
+        if (hue >= 360) {
+          hue = 0;
+        }
+        if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+          direction = !direction; //flip direction, goes up to 100, then down to 1
+        }
+        if (direction) {
+          ctx.lineWidth++;
+        } else {
+          ctx.lineWidth--;
+        }
+      }
+
+      canvas.addEventListener("mousedown", e => {
+        isDrawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY]; //update position BEFORE moving
+      });
+      canvas.addEventListener("mousemove", draw);
+
+      canvas.addEventListener("mouseup", () => (isDrawing = false));
+      canvas.addEventListener("mouseout", () => (isDrawing = false));
+    </script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+      }
+    </style>
+  </body>
 </html>
